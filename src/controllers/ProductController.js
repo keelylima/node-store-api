@@ -60,6 +60,25 @@ exports.getById = (req, res, next) => {
         })
 }
 
+exports.getByTag = (req, res, next) => {
+    Product
+        .find({
+            tags: req.params.tag,
+            active: true
+        }, 'title description price slug tags')
+        .then((p) => {
+            res.status(200).send({
+                message: 'Seus produtos meu querido',
+                products: p
+            })
+        })
+        .catch((error) => {
+            res.status(400).send({
+                message: 'Deu ruim, meu compatriota',
+                data: error
+            })
+        })
+}
 
 exports.post = (req, res, next) => {
     let product = new Product(req.body);
@@ -79,11 +98,26 @@ exports.post = (req, res, next) => {
 }
 
 exports.put = (req, res, next) => {
-    const id = req.params.id;
-   res.status(200).send({
-       id: id,
-       item: req.body
-   })
+    Product
+        .findByIdAndUpdate(req.params.id, {
+            //set vai atualizar apenas o que eu passar aqui, se eu não passar valor, vai atualizar pra null, os que não estiverem aqui, permanecem inalterados
+            $set: {
+                title: req.body.title,
+                description: req.body.description,
+                price: req.body.price
+            }
+        })
+        .then((p) => {
+            res.status(200).send({
+                message: 'Produto cadastrado com sucesso, bb'
+            })
+        })
+        .catch((error) => {
+            res.status(400).send({
+                message: 'Deu erro, bb',
+                data: error
+            })
+        })
 }
 
 exports.delete = (req, res, next) => {
