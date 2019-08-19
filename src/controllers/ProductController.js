@@ -43,6 +43,23 @@ exports.getBySlug = (req, res, next) => {
         })
 }
 
+exports.getById = (req, res, next) => {
+    Product
+        .findById(req.params.id)
+        .then((p) => {
+            res.status(200).send({
+                message: 'Seus produtos meu querido',
+                products: p
+            })
+        })
+        .catch((error) => {
+            res.status(400).send({
+                message: 'Deu ruim, meu compatriota',
+                data: error
+            })
+        })
+}
+
 
 exports.post = (req, res, next) => {
     let product = new Product(req.body);
