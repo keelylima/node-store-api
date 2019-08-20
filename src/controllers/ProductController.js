@@ -6,75 +6,120 @@ const ValidationContract = require('../validators/FluentValidator');
 const repository = require('../repositories/ProductRepository');
 
 //usando exports
-exports.get = (req, res, next) => {
-    repository
-        .get()
-        .then((p) => {
-            res.status(200).send({
-                message: 'Seus produtos meu querido',
-                products: p
-            })
+exports.get = async (req, res, next) => {
+    //novo
+    try {
+        let data = await repository.get();
+        res.status(200).send(data);
+    } catch (error) {
+        res.status(500).send({
+            message: 'Deu falha meu compatriota, olha aqui: ' + error
         })
-        .catch((error) => {
-            res.status(400).send({
-                message: 'Deu ruim, meu compatriota',
-                data: error
-            })
-        })
+    }
+
+    //Antigo
+    // repository
+    //     .get()
+    //     .then((p) => {
+    //         res.status(200).send({
+    //             message: 'Seus produtos meu querido',
+    //             products: p
+    //         })
+    //     })
+    //     .catch((error) => {
+    //         res.status(400).send({
+    //             message: 'Deu ruim, meu compatriota',
+    //             data: error
+    //         })
+    //     })
 }
 
-exports.getBySlug = (req, res, next) => {
-    repository
-        .getBySlug(req.params.slug)
-        .then((p) => {
-            res.status(200).send({
-                message: 'Seus produtos meu querido',
-                products: p
-            })
+exports.getBySlug = async(req, res, next) => {
+    //Novo
+    try {
+        let data = await repository.getBySlug(req.params.slug);
+        res.status(200).send(data);
+
+    } catch(error) {
+        res.status(500).send({
+            message: 'Deu erro, meu compatriota, dá uma olhada: ' + error
         })
-        .catch((error) => {
-            res.status(400).send({
-                message: 'Deu ruim, meu compatriota',
-                data: error
-            })
-        })
+    }
+    
+    //Antigo
+    // repository
+    //     .getBySlug(req.params.slug)
+    //     .then((p) => {
+    //         res.status(200).send({
+    //             message: 'Seus produtos meu querido',
+    //             products: p
+    //         })
+    //     })
+    //     .catch((error) => {
+    //         res.status(400).send({
+    //             message: 'Deu ruim, meu compatriota',
+    //             data: error
+    //         })
+    //     })
 }
 
-exports.getById = (req, res, next) => {
-    repository
-        .getById(req.params.id)
-        .then((p) => {
-            res.status(200).send({
-                message: 'Seus produtos meu querido',
-                products: p
-            })
+exports.getById = async (req, res, next) => {
+    //Novo
+    try {
+        let data = await repository.getById(req.params.id)
+        res.status(200).send(data);
+    } catch(error) {
+        res.status(500).send({
+            message: 'Deu erro, meu compatriota, olha aqui: ' + error
         })
-        .catch((error) => {
-            res.status(400).send({
-                message: 'Deu ruim, meu compatriota',
-                data: error
-            })
-        })
+    }
+    
+    //Antigo
+    // repository
+    //     .getById(req.params.id)
+    //     .then((p) => {
+    //         res.status(200).send({
+    //             message: 'Seus produtos meu querido',
+    //             products: p
+    //         })
+    //     })
+    //     .catch((error) => {
+    //         res.status(400).send({
+    //             message: 'Deu ruim, meu compatriota',
+    //             data: error
+    //         })
+    //     })
 }
 
-exports.getByTag = (req, res, next) => {
-    repository
-        .getByTag(req.params.tag)
-        .then((p) => {
-            res.status(200).send({
-                message: 'Seus produtos meu querido',
-                products: p
-            })
+exports.getByTag = async(req, res, next) => {
+    //Novo
+    try {
+        let data = await repository.getByTag(req.params.tag);
+        res.status(200).send(data);
+    } catch(error) {
+        res.status(500).send({
+            message: 'Deu ruim meu compatriota, dá uma olhada aí: ' + error
         })
-        .catch((error) => {
-            res.status(400).send({
-                message: 'Deu ruim, meu compatriota',
-                data: error
-            })
-        })
+    }
+    
+    //Antigo
+    // repository
+    //     .getByTag(req.params.tag)
+    //     .then((p) => {
+    //         res.status(200).send({
+    //             message: 'Seus produtos meu querido',
+    //             products: p
+    //         })
+    //     })
+    //     .catch((error) => {
+    //         res.status(400).send({
+    //             message: 'Deu ruim, meu compatriota',
+    //             data: error
+    //         })
+    //     })
 }
 
-exports.post = (req, res, next) => {
+exports.post = async (req, res, next) => {
     let contract = new ValidationContract();
     contract.hasMinLeh(req.body.title, 3, 'O título deve ter pelo menos 3 caracteres, bb');
     contract.hasMinLeh(req.body.slug, 3, 'O slug deve ter pelo menos 3 caracteres, bb');
@@ -86,52 +131,92 @@ exports.post = (req, res, next) => {
         return;
     }
 
+    try {
+        let data = await repository.create(req.body);
+        res.status(201).send({
+            data,
+            message: 'Produto cadastrado, bb'
+        });
+    } catch(error) {
+        res.status(500).send({
+            message: 'Deu ruim meu compatriota, dá uma olhada: ' + error
+        })
+    }
 
-    repository
-        .create(req.body)
-        .then((p) => {
-            res.status(201).send({
-                message: 'Produto cadastrado com sucesso, bb'
-            })
-        })
-        .catch((error) => {
-            res.status(400).send({
-                message: 'Deu erro, bb',
-                data: error
-            })
-        })
+    //Antigo
+    // repository
+    //     .create(req.body)
+    //     .then((p) => {
+    //         res.status(201).send({
+    //             message: 'Produto cadastrado com sucesso, bb'
+    //         })
+    //     })
+    //     .catch((error) => {
+    //         res.status(400).send({
+    //             message: 'Deu erro, bb',
+    //             data: error
+    //         })
+    //     })
 }
 
-exports.put = (req, res, next) => {
-    repository
-        .update(req.params.id, req.body)
-        .then((p) => {
-            res.status(200).send({
-                message: 'Produto cadastrado com sucesso, bb'
-            })
+exports.put = async (req, res, next) => {
+    try {
+        let data = await repository.update(req.params.id, req.body);
+        res.status(200).send({
+            data,
+            message: 'Produto atualizado, meu anjo'
         })
-        .catch((error) => {
-            res.status(400).send({
-                message: 'Deu erro, bb',
-                data: error
-            })
+    } catch(error) {
+        res.status(500).send({
+            message: 'Deu erro, meu compatriota, olha ai: ' + error
         })
+    }
+    
+    
+    //Antigo
+    // repository
+    //     .update(req.params.id, req.body)
+    //     .then((p) => {
+    //         res.status(200).send({
+    //             message: 'Produto cadastrado com sucesso, bb'
+    //         })
+    //     })
+    //     .catch((error) => {
+    //         res.status(400).send({
+    //             message: 'Deu erro, bb',
+    //             data: error
+    //         })
+    //     })
 }
 
-exports.delete = (req, res, next) => {
-    repository
-        .delete(req.body.id)
-        .then((p) => {
-            res.status(200).send({
-                message: 'Produto removido com sucesso, bb'
-            })
+exports.delete = async (req, res, next) => {
+    try {
+        let data = await repository.delete(req.params.id);
+        res.status(200).send({
+            message: 'Deletado com sucesso, bb'
         })
-        .catch((error) => {
-            res.status(400).send({
-                message: 'Deu erro, bb',
-                data: error
-            })
+    } catch(error) {
+        res.status(500).send({
+            message: 'Deu ruim, meu compatriota, dá uma olhada aí: ' + error
         })
+    }
+    
+    
+    
+    //Antigo
+    // repository
+    //     .delete(req.body.id)
+    //     .then((p) => {
+    //         res.status(200).send({
+    //             message: 'Produto removido com sucesso, bb'
+    //         })
+    //     })
+    //     .catch((error) => {
+    //         res.status(400).send({
+    //             message: 'Deu erro, bb',
+    //             data: error
+    //         })
+    //     })
 }
 
 
