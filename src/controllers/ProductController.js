@@ -3,13 +3,12 @@
 const mongoose = require('mongoose');
 const Product = mongoose.model('Product');
 const ValidationContract = require('../validators/FluentValidator');
+const repository = require('../repositories/ProductRepository');
 
 //usando exports
 exports.get = (req, res, next) => {
-    Product
-        .find({ //sem nada dentro, ele vai trazer todos
-            active: true //pra trazer apenas produtos "ativos" no sistema
-        }, 'title price slug') //segundo parametro é tudo o que eu quero trazer
+    repository
+        .get()
         .then((p) => {
             res.status(200).send({
                 message: 'Seus produtos meu querido',
@@ -25,11 +24,8 @@ exports.get = (req, res, next) => {
 }
 
 exports.getBySlug = (req, res, next) => {
-    Product
-        .findOne({ //não retorna uma array (?)
-            slug: req.params.slug, //vai buscar de acordo com slug que eu passar
-            active: true
-        }, 'title description price slug tags')
+    repository
+        .getBySlug(req.params.slug)
         .then((p) => {
             res.status(200).send({
                 message: 'Seus produtos meu querido',
@@ -45,8 +41,8 @@ exports.getBySlug = (req, res, next) => {
 }
 
 exports.getById = (req, res, next) => {
-    Product
-        .findById(req.params.id)
+    repository
+        .getById(req.params.id)
         .then((p) => {
             res.status(200).send({
                 message: 'Seus produtos meu querido',
@@ -62,11 +58,8 @@ exports.getById = (req, res, next) => {
 }
 
 exports.getByTag = (req, res, next) => {
-    Product
-        .find({
-            tags: req.params.tag,
-            active: true
-        }, 'title description price slug tags')
+    repository
+        .getByTag(req.params.tag)
         .then((p) => {
             res.status(200).send({
                 message: 'Seus produtos meu querido',
@@ -88,15 +81,14 @@ exports.post = (req, res, next) => {
     contract.hasMinLeh(req.body.description, 3, 'A description deve ter pelo menos 3 caracteres, bb');
 
     //Se os dados forem inválidos
-    if(!contract.isValid()) {
+    if (!contract.isValid()) {
         res.status(400).send(contract.errors()).end()
         return;
     }
 
 
-    let product = new Product(req.body);
-    product
-        .save()
+    repository
+        .create(req.body)
         .then((p) => {
             res.status(201).send({
                 message: 'Produto cadastrado com sucesso, bb'
@@ -111,15 +103,8 @@ exports.post = (req, res, next) => {
 }
 
 exports.put = (req, res, next) => {
-    Product
-        .findByIdAndUpdate(req.params.id, {
-            //set vai atualizar apenas o que eu passar aqui, se eu não passar valor, vai atualizar pra null, os que não estiverem aqui, permanecem inalterados
-            $set: {
-                title: req.body.title,
-                description: req.body.description,
-                price: req.body.price
-            }
-        })
+    repository
+        .update(req.params.id, req.body)
         .then((p) => {
             res.status(200).send({
                 message: 'Produto cadastrado com sucesso, bb'
@@ -134,8 +119,8 @@ exports.put = (req, res, next) => {
 }
 
 exports.delete = (req, res, next) => {
-    Product
-        .findOneAndRemove(req.body.id)
+    repository
+        .delete(req.body.id)
         .then((p) => {
             res.status(200).send({
                 message: 'Produto removido com sucesso, bb'
