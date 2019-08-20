@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const Product = mongoose.model('Product');
+const ValidationContract = require('../validators/FluentValidator');
 
 //usando exports
 exports.get = (req, res, next) => {
@@ -81,6 +82,18 @@ exports.getByTag = (req, res, next) => {
 }
 
 exports.post = (req, res, next) => {
+    let contract = new ValidationContract();
+    contract.hasMinLeh(req.body.title, 3, 'O título deve ter pelo menos 3 caracteres, bb');
+    contract.hasMinLeh(req.body.slug, 3, 'O slug deve ter pelo menos 3 caracteres, bb');
+    contract.hasMinLeh(req.body.description, 3, 'A description deve ter pelo menos 3 caracteres, bb');
+
+    //Se os dados forem inválidos
+    if(!contract.isValid()) {
+        res.status(400).send(contract.errors()).end()
+        return;
+    }
+
+
     let product = new Product(req.body);
     product
         .save()
@@ -121,7 +134,19 @@ exports.put = (req, res, next) => {
 }
 
 exports.delete = (req, res, next) => {
-    res.status(200).send(req.body);
+    Product
+        .findOneAndRemove(req.body.id)
+        .then((p) => {
+            res.status(200).send({
+                message: 'Produto removido com sucesso, bb'
+            })
+        })
+        .catch((error) => {
+            res.status(400).send({
+                message: 'Deu erro, bb',
+                data: error
+            })
+        })
 }
 
 
